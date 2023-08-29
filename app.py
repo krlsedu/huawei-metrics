@@ -2,10 +2,13 @@ import decimal
 import json
 
 from flask import Flask
+from flask_cors import CORS
 
 from services.Huawei import Ax3Pro
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 ax3_pro = Ax3Pro()
 
@@ -28,6 +31,5 @@ def deviceinfo():  # put application's code here
     return scrape, 200, {'Content-Type': 'application/json'}
 
 
-
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
