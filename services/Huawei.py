@@ -61,13 +61,14 @@ class Ax3Pro:
 
     def scrape(self, path):
         self.browser.execute_script('window.localStorage.clear();')
-        self.browser.get(self.base_url + path)
+        self.browser.get(self.base_url + "/html/index.html#/devicecontrol")
 
         url = self.browser.current_url
 
         if "login" in url:
             self.login()
-            self.browser.get(self.base_url + path)
+
+        self.browser.get(self.base_url + path)
         pg = self.browser.page_source
         soup = BeautifulSoup(pg, 'html.parser')
         pg = soup.find_all('body')[0].text
