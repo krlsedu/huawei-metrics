@@ -19,7 +19,7 @@ class Encoder(json.JSONEncoder):
             return float(obj)
 
 
-@app.route('/metrics')
+@app.route('/prometheus-metrics')
 def metrics():  # put application's code here
     scrape = ax3_pro.scrape("/api/system/HostInfo")
     return scrape, 200, {'Content-Type': 'text/plain; version=0.0.4; charset=utf-8'}
