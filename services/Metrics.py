@@ -45,14 +45,22 @@ class PrometheusMetric:
 
         ##get current time in seconds
         ns = time.time_ns() // 1000000000
+        sum_ = label + "_" + direction + '_sum'
         count_ = label + "_" + direction + '_count'
         try:
-            value_ = self.values[count_]
+            value_ = self.values[sum_]
         except:
             value_ = None
-        self.values[count_] = value
+        if value_ is None:
+            self.values[count_] = 0
+        else:
+            self.values[count_] = value - value_
+        self.values[sum_] = value
+        self.timestamps[sum_] = ns
         self.timestamps[count_] = ns
+        self.hosts[sum_] = host
         self.hosts[count_] = host
+        self.directions[sum_] = direction
         self.directions[count_] = direction
         self.rate(label + "_" + direction + '_rate', direction, value, ns, host, value_)
 
@@ -76,9 +84,13 @@ class PrometheusMetric:
                 result.append('#HELP ' + self.name + ' ' + self.description + ' - gauge')
                 result.append(
                     f'huawei_{self.name}_rate{{host="{host_}", direction="{direction_}", unit="Kbps"}} {value * 8}')
-            else:
-
+            elif label.endswith("_count"):
                 result.append('#HELP ' + self.name + ' ' + self.description + ' - counter')
-                result.append(f'huawei_{self.name}_count{{host="{host_}", direction="{direction_}",unit="KBytes"}} {value}')
+                result.append(
+                    f'huawei_{self.name}_count{{host="{host_}", direction="{direction_}",unit="KBytes"}} {value}')
+            else:
+                result.append('#HELP ' + self.name + ' ' + self.description + ' - sum')
+                result.append(
+                    f'huawei_{self.name}_sum{{host="{host_}", direction="{direction_}",unit="KBytes"}} {value}')
         result = '\n'.join(result)
         return result
