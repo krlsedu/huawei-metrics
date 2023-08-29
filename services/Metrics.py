@@ -75,10 +75,10 @@ class PrometheusMetric:
             if label.endswith("_rate"):
                 result.append('#HELP ' + self.name + ' ' + self.description + ' - gauge')
                 result.append(
-                    f'{self.name}_rate{{host="{host_}", direction="{direction_}", unit="Kbps"}} {value * 8}')
+                    f'huawei_{self.name}_rate{{host="{host_}", direction="{direction_}", unit="Kbps"}} {value * 8}')
             else:
 
                 result.append('#HELP ' + self.name + ' ' + self.description + ' - counter')
-                result.append(f'{self.name}_count{{host="{host_}", direction="{direction_}",unit="KBytes"}} {value}')
+                result.append(f'huawei_{self.name}_count{{host="{host_}", direction="{direction_}",unit="KBytes"}} {value}')
         result = '\n'.join(result)
         return result

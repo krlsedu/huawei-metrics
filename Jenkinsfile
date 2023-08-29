@@ -1,9 +1,9 @@
 #!groovy
 env.RELEASE_COMMIT = "1";
 env.VERSION_NAME = "";
-env.SERVICE_NAME = "csctracker_services_invest"
-env.IMAGE_NAME = "csctracker-invest"
-env.REPOSITORY_NAME = "CscTrackerInvest"
+env.SERVICE_NAME = "monitoramento_service_huawei_metrics"
+env.IMAGE_NAME = "huawei-metrics"
+env.REPOSITORY_NAME = "huawei-metrics"
 
 pipeline {
     agent none

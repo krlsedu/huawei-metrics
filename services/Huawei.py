@@ -40,7 +40,7 @@ class Ax3Pro:
         if platform.system() == "Windows":
             phantomjs_path = "./phantomjs.exe"
         else:
-            phantomjs_path = "./phantomjs"
+            phantomjs_path = "phantomjs"
 
         self.browser = webdriver.PhantomJS(phantomjs_path)
         self.browser.get(self.base_url)
@@ -54,10 +54,13 @@ class Ax3Pro:
 
             elem = self.browser.find_element_by_id("loginbtn")
             elem.click()
-        except:
+        except Exception as e:
+            print(e)
+            self.login()
             pass
 
     def scrape(self, path):
+        self.browser.execute_script('window.localStorage.clear();')
         self.browser.get(self.base_url + path)
 
         url = self.browser.current_url
@@ -66,7 +69,6 @@ class Ax3Pro:
             self.login()
             self.browser.get(self.base_url + path)
         pg = self.browser.page_source
-        print(pg)
         soup = BeautifulSoup(pg, 'html.parser')
         pg = soup.find_all('body')[0].text
 
