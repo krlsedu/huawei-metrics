@@ -120,15 +120,6 @@ https://github.com/Enrico204/dd-wrt-prometheus-exporter
 
 If you have any questions or encountered any issues, feel free to open an issue in this repository.
 
-## Authors
-
-Your Name here
-
-## Version History
-
-* 0.1
-    * Initial Release
-
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
