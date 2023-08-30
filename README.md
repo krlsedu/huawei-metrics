@@ -35,6 +35,12 @@ To install necessary packages, run:
 pip install -r requirements.txt
 ```
 
+## Execution
+```bash
+python app.py
+```
+
+## Docker session
 ## Building Docker Image
 
 The Dockerfile for this project is included. To build a Docker image, use the following command:
@@ -59,6 +65,7 @@ You can run the Docker image as follows, replacing `<env>` with your actual envi
 docker run -e HUAWEI_HOST=  -e HUAWEI_USER=  -e HUAWEI_PASSWORD=  huawei-prometheus-exporter
 ```
 or
+
 ```bash
 docker compose up -d
 ```
