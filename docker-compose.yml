@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  huawei_metrics:
+    container_name: huawei_metrics
+    hostname: huawei_metrics
+    image: krlsedu/huawei-metrics
+    environment:
+      HUAWEI_HOST: 192.168.15.1
+      HUAWEI_USER: admin
+      HUAWEI_PASSWORD: admis
+    restart: always
+    ports:
+      - "5000:5000"
