@@ -43,7 +43,6 @@ class PrometheusMetric:
 
     def add(self, label, direction, value, host=None):
 
-        ##get current time in seconds
         ns = time.time_ns() // 1000000000
         sum_ = label + "_" + direction + '_sum'
         count_ = label + "_" + direction + '_count'

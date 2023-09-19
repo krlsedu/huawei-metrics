@@ -8,3 +8,4 @@
 /scripts/
 /pyvenv.cfg
 *.log
+*.exe

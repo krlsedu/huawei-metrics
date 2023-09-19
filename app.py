@@ -5,6 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from services.Huawei import Ax3Pro
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -18,6 +19,8 @@ class Encoder(json.JSONEncoder):
         if isinstance(obj, decimal.Decimal):
             return float(obj)
 
+
+metrics = PrometheusMetrics(app, group_by='endpoint', default_labels={'application': 'HuaweiMetrics'})
 
 @app.route('/prometheus-metrics')
 def metrics():  # put application's code here
