@@ -22,6 +22,15 @@ class Encoder(json.JSONEncoder):
 
 metrics = PrometheusMetrics(app, group_by='endpoint', default_labels={'application': 'HuaweiMetrics'})
 
+
+@app.route('/health')
+def health():
+    if ax3_pro.is_valid():
+        return "OK", 200
+    else:
+        return "NOK", 500
+
+
 @app.route('/prometheus-metrics')
 def metrics():  # put application's code here
     scrape = ax3_pro.scrape("/api/system/HostInfo")

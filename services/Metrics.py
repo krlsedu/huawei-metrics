@@ -23,6 +23,7 @@ class PrometheusMetric:
         self.timestamps = {}
         self.hosts = {}
         self.directions = {}
+        self.is_valid = True
 
     def to_metric(self, text):
         try:
@@ -39,7 +40,11 @@ class PrometheusMetric:
         except Exception as e:
             print(e)
             print()
+            self.is_valid = False
             pass
+
+    def is_valid(self):
+        return self.is_valid
 
     def add(self, label, direction, value, host=None):
 
