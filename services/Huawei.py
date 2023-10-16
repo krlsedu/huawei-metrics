@@ -77,5 +77,6 @@ class Ax3Pro:
 
         return metrics_network.format()
 
+
     def is_valid(self):
         return metrics_network.is_valid()

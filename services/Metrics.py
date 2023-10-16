@@ -43,9 +43,6 @@ class PrometheusMetric:
             self.is_valid = False
             pass
 
-    def is_valid(self):
-        return self.is_valid
-
     def add(self, label, direction, value, host=None):
 
         ns = time.time_ns() // 1000000000

@@ -25,7 +25,7 @@ metrics = PrometheusMetrics(app, group_by='endpoint', default_labels={'applicati
 
 @app.route('/health')
 def health():
-    if ax3_pro.is_valid():
+    if ax3_pro.is_valid:
         return "OK", 200
     else:
         return "NOK", 500
