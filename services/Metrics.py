@@ -26,22 +26,16 @@ class PrometheusMetric:
         self.is_valid = True
 
     def to_metric(self, text):
-        try:
-            json_array = json.loads(text)
-            for json_item in json_array:
-                host_ = json_item['ActualName']
-                if host_ == "":
-                    host_ = json_item['HostName']
-                id_ = json_item['ID']
-                ##replace - for _ and . for _
-                id_ = id_.replace("-", "_").replace(".", "_")
-                self.add(id_, "tx", float(json_item['TxKBytes']), host_)
-                self.add(id_, "rx", float(json_item['RxKBytes']), host_)
-        except Exception as e:
-            print(e)
-            print()
-            self.is_valid = False
-            pass
+        json_array = json.loads(text)
+        for json_item in json_array:
+            host_ = json_item['ActualName']
+            if host_ == "":
+                host_ = json_item['HostName']
+            id_ = json_item['ID']
+            ##replace - for _ and . for _
+            id_ = id_.replace("-", "_").replace(".", "_")
+            self.add(id_, "tx", float(json_item['TxKBytes']), host_)
+            self.add(id_, "rx", float(json_item['RxKBytes']), host_)
 
     def add(self, label, direction, value, host=None):
 
