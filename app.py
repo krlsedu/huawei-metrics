@@ -22,11 +22,11 @@ class Encoder(json.JSONEncoder):
 
 metrics = PrometheusMetrics(app, group_by='endpoint', default_labels={'application': 'HuaweiMetrics'})
 
-is_valid = True
+DATA_VALID = True
 
 @app.route('/health')
 def health():
-    if is_valid:
+    if DATA_VALID:
         return "OK", 200
     else:
         return "NOK", 500
@@ -38,14 +38,20 @@ def metrics():  # put application's code here
         scrape = ax3_pro.scrape("/api/system/HostInfo")
         return scrape, 200, {'Content-Type': 'text/plain; version=0.0.4; charset=utf-8'}
     except Exception as e:
-        is_valid = False
+        global DATA_VALID
+        DATA_VALID = False
         return str(e), 500, {'Content-Type': 'text/plain; version=0.0.4; charset=utf-8'}
 
 
 @app.route('/deviceinfo')
 def deviceinfo():  # put application's code here
-    scrape = ax3_pro.scrape("/api/system/deviceinfo")
-    return scrape, 200, {'Content-Type': 'application/json'}
+    try:
+        scrape = ax3_pro.scrape("/api/system/deviceinfo")
+        return scrape, 200, {'Content-Type': 'application/json'}
+    except Exception as e:
+        global DATA_VALID
+        DATA_VALID = False
+        return str(e), 500, {'Content-Type': 'application/json'}
 
 
 if __name__ == '__main__':
