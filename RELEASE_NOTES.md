@@ -1,36 +1,34 @@
-Aqui está o Release Notes técnico para a versão **v26.13.003**, estruturado com base nas alterações identificadas no commit.
+Aqui está o Release Notes técnico para a versão **v26.13.004**, focado em clareza e impacto técnico.
 
 ---
 
-# 📦 Release Notes - v26.13.003
+# 📝 Release Notes - v26.13.004
 
-## Resumo Técnico
-Esta versão foca na expansão da infraestrutura de dados, introduzindo persistência analítica via ClickHouse e otimizando a coleta de métricas. Foram implementadas melhorias significativas no processamento em segundo plano para garantir maior escalabilidade na ingestão de dados.
+## Resumo
+Esta versão foca na correção da serialização de métricas, garantindo a integridade dos dados temporais ao adotar objetos datetime com fuso horário (timezone-aware).
+
+---
+
+## 🐛 Fixes
+
+### Core / Metrics Service
+- **Correção na formatação de métricas JSON:** Ajustada a lógica de serialização no serviço de métricas para utilizar objetos `datetime` com informação de fuso horário. 
+    - **Impacto:** Resolve problemas de inconsistência em dashboards e ferramentas de monitoramento que dependem de precisão temporal (UTC vs Local Time).
+    - **Arquivo afetado:** `services/Metrics.py`
 
 ---
 
 ## 🚀 Features
-
-*   **Integração com ClickHouse:** Implementação do novo serviço `ClickHouseDb.py`, permitindo o armazenamento de dados em alta performance para fins analíticos.
-*   **Ingestão de Dados em Background:** Otimização do fluxo principal (`app.py`) para suportar a ingestão de dados de forma assíncrona, reduzindo o tempo de resposta da aplicação.
-*   **Novo Sistema de Métricas:** Introdução do serviço `Metrics.py` com suporte a formatação em **JSON**, facilitando a integração com ferramentas de monitoramento (ex: Prometheus, Grafana).
-*   **Expansão do Provedor Huawei:** Atualização no serviço `Huawei.py` para suporte a novos campos ou métodos de coleta.
-
-## 🐛 Fixes
-
-*   **Ajustes de Conectividade:** Correções pontuais na comunicação entre serviços internos e a camada de persistência.
-*   **Estabilidade no App Core:** Refatoração de blocos lógicos no `app.py` para melhor tratamento de exceções durante o processamento de métricas.
-
-## 🔧 Chore
-
-*   **Atualização de Dependências:** Inclusão de novas bibliotecas no `requirements.txt` necessárias para a conexão com ClickHouse.
-*   **Orquestração Docker:** Ajustes no `docker-compose.yml` para provisionamento e configuração dos novos serviços de banco de dados e rede.
-*   **Estrutura de Pacotes:** Inicialização do módulo `service/__init__.py`.
+*Nenhuma nova funcionalidade foi introduzida nesta versão.*
 
 ---
 
-### 📊 Estatísticas do Commit
-- **Arquivos alterados:** 7
-- **Inserções:** 168
-- **Deleções:** 7
-- **Responsável:** Carlos Eduardo Duarte Schwalm
+## 🔧 Chore
+*Nenhuma tarefa de manutenção ou infraestrutura foi registrada nesta versão.*
+
+---
+
+**Informações Técnicas:**
+- **Commit:** `a8a6c23`
+- **Autor:** Carlos Eduardo Duarte Schwalm (krlsedu)
+- **Data de Referência:** 2026

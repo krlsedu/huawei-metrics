@@ -8,7 +8,7 @@ services:
     environment:
       HUAWEI_HOST: 192.168.15.1
       HUAWEI_USER: admin
-      HUAWEI_PASSWORD: Su-231018
+      HUAWEI_PASSWORD: senha
     restart: always
     ports:
       - "5000:5000"
