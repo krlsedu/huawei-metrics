@@ -4,11 +4,11 @@ services:
   huawei_metrics:
     container_name: huawei_metrics
     hostname: huawei_metrics
-    image: krlsedu/huawei-metrics
+    image: krlsedu/huawei-metrics:26.13.007
     environment:
       HUAWEI_HOST: 192.168.15.1
       HUAWEI_USER: admin
-      HUAWEI_PASSWORD: admis
+      HUAWEI_PASSWORD: Su-231018
     restart: always
     ports:
       - "5000:5000"

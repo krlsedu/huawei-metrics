@@ -111,3 +111,45 @@ class PrometheusMetric:
                     f'huawei_{self.name}_sum{{host="{host_}", direction="{direction_}",unit="KBytes"}} {value}')
         result = '\n'.join(result)
         return result
+
+    def format_as_json(self):
+        # Pega a hora exata desse lote de métricas (mantendo o padrão UTC)
+        agora = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+        # Dicionário temporário pra agrupar as coisas
+        agrupado = {}
+
+        for label, value in self.values.items():
+            # Puxa o host e a direção (tx ou rx)
+            host_ = self.hosts.get(label, "Desconhecido")
+            direction_ = self.directions.get(label, "")
+
+            # Se o host ainda não tá no nosso dicionário, cria uma casinha pra ele
+            if host_ not in agrupado:
+                agrupado[host_] = {}
+
+            # Batiza a chave que vai ficar dentro do JSON e ajusta a matemática
+            if label.endswith("_rate"):
+                chave = f"{direction_}_rate_kbps"
+                val = value * 8
+            elif label.endswith("_count"):
+                chave = f"{direction_}_count_kb"
+                val = value
+            else:
+                chave = f"{direction_}_sum_kb"
+                val = value
+
+            # Joga o dado lá pra dentro do dicionário do host
+            agrupado[host_][chave] = val
+
+        # Agora transforma esse grupão num array de dicionários pro teu insert
+        result = []
+        for host, dados_dict in agrupado.items():
+            result.append({
+                "timestamp": agora,
+                "host": host,
+                # O json.dumps aqui é o que vai gerar a string que vai pra coluna "dados"
+                "dados": json.dumps(dados_dict)
+            })
+
+        return result

@@ -76,7 +76,7 @@ class Ax3Pro:
         return pg
 
 
-    def get_metrics(self, hosts:str, wan:str = None):
+    def get_metrics(self, hosts:str, wan:str = None, as_json:bool = False):
 
         if wan:
             hosts = json.loads(hosts)
@@ -92,6 +92,9 @@ class Ax3Pro:
             )
 
         metrics_network.to_metric(json.dumps(hosts))
+
+        if as_json:
+            return metrics_network.format_as_json()
 
         return metrics_network.format()
 
