@@ -1,36 +1,30 @@
-# Release Notes - v26.13.001
+Olá, time. Como Tech Lead responsável, analisei o commit `9510e42` e consolidei as alterações para a versão **v26.13.002**.
 
-Esta versão consolida a implementação do **Huawei AX3 Pro Prometheus Exporter**, focando na estabilidade da coleta de métricas, melhoria no tratamento de erros e padronização do pipeline de CI/CD.
-
----
-
-### 🚀 Features
-
-*   **Monitoramento Prometheus:** Implementação de endpoint nativo para exportação de métricas (`/prometheus-metrics`).
-*   **Health Check:** Adição de rota de saúde (`/health`) e método `is_valid` para monitoramento do status da aplicação e dos serviços Huawei/Metrics.
-*   **Suporte a Docker:** Criação de `Dockerfile` otimizado e `docker-compose.yml` para orquestração local.
-*   **Dashboard Grafana:** Inclusão de template JSON pré-configurado para visualização das métricas do roteador Huawei AX3 Pro.
-*   **CORS Support:** Adicionado suporte a Cross-Origin Resource Sharing (CORS) na API Flask.
-*   **Documentação Técnica:** Criação de guia de execução no `README.md`, além dos arquivos de governança `LICENSE` e `CODE_OF_CONDUCT.md`.
+Esta release foca na expansão da observabilidade de rede, introduzindo a coleta de métricas de tráfego WAN, além de melhorias na infraestrutura de containerização.
 
 ---
 
-### 🐛 Fixes
+# Release Notes - v26.13.002
 
-*   **Tratamento de Erros:** Refatoração robusta no tratamento de exceções durante a conversão de métricas e no processo de scraping.
-*   **Estabilidade do Scraper:** Ajuste no caminho do target do scraper no serviço Huawei e atualização da lógica de verificação de validade de variáveis.
-*   **Limpeza de Binários:** Remoção de arquivos executáveis (`phantomjs.exe`, `ghostdriver.log`) do repositório para reduzir o tamanho do artefato e evitar conflitos de ambiente.
-*   **Ajuste de Rotas:** Padronização do endpoint de métricas e parâmetros de execução do Flask.
+## 🚀 Features
+*   **Métricas de Tráfego WAN:** Implementado suporte para coleta e exposição de métricas de tráfego WAN (Wide Area Network).
+*   **Atualização do Scraper:** Evolução da lógica de scraping no serviço `Huawei.py` para suportar os novos datapoints.
+*   **Novo Módulo de Métricas:** Adição do serviço `Metrics.py` para centralizar a lógica de processamento de indicadores.
 
----
+## 🐛 Fixes
+*   **Ajuste na Inicialização:** Pequena correção na lógica de bootstrap do `app.py` para garantir a correta carga dos novos serviços de métricas.
 
-### 🔧 Chore
-
-*   **CI/CD Pipeline:** Atualização do `Jenkinsfile` com suporte a credenciais SSH e melhorias no deploy automatizado.
-*   **Gerenciamento de Dependências:** Atualização do `requirements.txt` e inclusão de novas bibliotecas necessárias.
-*   **Git Ignore:** Atualização do `.gitignore` para ignorar arquivos de log, binários e arquivos de sistema.
-*   **Refatoração de Código:** Limpeza de seções obsoletas no `README.md` (Histórico de Versões e Autores) e simplificação do `Dockerfile`.
-*   **Build Automation:** Sincronização de versões via `version.txt` através de múltiplos gatilhos de build automatizados.
+## 🔧 Chore
+*   **Otimização Docker:** Adição do arquivo `.dockerignore` robusto para reduzir o contexto de build e aumentar a segurança da imagem.
+*   **Padronização de Nomenclatura:** Criação dos arquivos de metadados `app_name.txt` e `docker_name.txt` para automação de CI/CD.
 
 ---
-*Build consolidado por Tech Lead.*
+
+### 📝 Resumo Técnico
+*   **Total de arquivos alterados:** 6
+*   **Linhas adicionadas:** 77
+*   **Linhas removidas:** 2
+*   **Impacto:** Alta melhoria na visibilidade de performance de rede para dispositivos Huawei.
+
+**Assinado por:**
+*Tech Lead*
