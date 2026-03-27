@@ -114,7 +114,7 @@ class PrometheusMetric:
 
     def format_as_json(self):
         # Pega a hora exata desse lote de métricas (mantendo o padrão UTC)
-        agora = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        agora = datetime.datetime.now(datetime.timezone.utc)
 
         # Dicionário temporário pra agrupar as coisas
         agrupado = {}
