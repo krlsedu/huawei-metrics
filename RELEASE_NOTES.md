@@ -1,30 +1,36 @@
-Olá, time. Como Tech Lead responsável, analisei o commit `9510e42` e consolidei as alterações para a versão **v26.13.002**.
-
-Esta release foca na expansão da observabilidade de rede, introduzindo a coleta de métricas de tráfego WAN, além de melhorias na infraestrutura de containerização.
+Aqui está o Release Notes técnico para a versão **v26.13.003**, estruturado com base nas alterações identificadas no commit.
 
 ---
 
-# Release Notes - v26.13.002
+# 📦 Release Notes - v26.13.003
+
+## Resumo Técnico
+Esta versão foca na expansão da infraestrutura de dados, introduzindo persistência analítica via ClickHouse e otimizando a coleta de métricas. Foram implementadas melhorias significativas no processamento em segundo plano para garantir maior escalabilidade na ingestão de dados.
+
+---
 
 ## 🚀 Features
-*   **Métricas de Tráfego WAN:** Implementado suporte para coleta e exposição de métricas de tráfego WAN (Wide Area Network).
-*   **Atualização do Scraper:** Evolução da lógica de scraping no serviço `Huawei.py` para suportar os novos datapoints.
-*   **Novo Módulo de Métricas:** Adição do serviço `Metrics.py` para centralizar a lógica de processamento de indicadores.
+
+*   **Integração com ClickHouse:** Implementação do novo serviço `ClickHouseDb.py`, permitindo o armazenamento de dados em alta performance para fins analíticos.
+*   **Ingestão de Dados em Background:** Otimização do fluxo principal (`app.py`) para suportar a ingestão de dados de forma assíncrona, reduzindo o tempo de resposta da aplicação.
+*   **Novo Sistema de Métricas:** Introdução do serviço `Metrics.py` com suporte a formatação em **JSON**, facilitando a integração com ferramentas de monitoramento (ex: Prometheus, Grafana).
+*   **Expansão do Provedor Huawei:** Atualização no serviço `Huawei.py` para suporte a novos campos ou métodos de coleta.
 
 ## 🐛 Fixes
-*   **Ajuste na Inicialização:** Pequena correção na lógica de bootstrap do `app.py` para garantir a correta carga dos novos serviços de métricas.
+
+*   **Ajustes de Conectividade:** Correções pontuais na comunicação entre serviços internos e a camada de persistência.
+*   **Estabilidade no App Core:** Refatoração de blocos lógicos no `app.py` para melhor tratamento de exceções durante o processamento de métricas.
 
 ## 🔧 Chore
-*   **Otimização Docker:** Adição do arquivo `.dockerignore` robusto para reduzir o contexto de build e aumentar a segurança da imagem.
-*   **Padronização de Nomenclatura:** Criação dos arquivos de metadados `app_name.txt` e `docker_name.txt` para automação de CI/CD.
+
+*   **Atualização de Dependências:** Inclusão de novas bibliotecas no `requirements.txt` necessárias para a conexão com ClickHouse.
+*   **Orquestração Docker:** Ajustes no `docker-compose.yml` para provisionamento e configuração dos novos serviços de banco de dados e rede.
+*   **Estrutura de Pacotes:** Inicialização do módulo `service/__init__.py`.
 
 ---
 
-### 📝 Resumo Técnico
-*   **Total de arquivos alterados:** 6
-*   **Linhas adicionadas:** 77
-*   **Linhas removidas:** 2
-*   **Impacto:** Alta melhoria na visibilidade de performance de rede para dispositivos Huawei.
-
-**Assinado por:**
-*Tech Lead*
+### 📊 Estatísticas do Commit
+- **Arquivos alterados:** 7
+- **Inserções:** 168
+- **Deleções:** 7
+- **Responsável:** Carlos Eduardo Duarte Schwalm
