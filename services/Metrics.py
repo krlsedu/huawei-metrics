@@ -40,6 +40,28 @@ class PrometheusMetric:
     def add(self, label, direction, value, host=None):
 
         ns = time.time_ns() // 1000000000
+        if host == "Wan":
+            rate_label = label + "_" + direction + '_rate'
+            sum_label = label + "_" + direction + '_sum'
+
+            if rate_label in self.timestamps:
+                delta_time = ns - self.timestamps[rate_label]
+                trafego_estimado = value * delta_time
+            else:
+                trafego_estimado = 0
+
+            self.values[rate_label] = value
+            self.timestamps[rate_label] = ns
+            self.hosts[rate_label] = host
+            self.directions[rate_label] = direction
+
+            self.values[sum_label] = self.values.get(sum_label, 0) + trafego_estimado
+            self.timestamps[sum_label] = ns
+            self.hosts[sum_label] = host
+            self.directions[sum_label] = direction
+
+            return
+
         sum_ = label + "_" + direction + '_sum'
         count_ = label + "_" + direction + '_count'
         try:

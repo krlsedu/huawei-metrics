@@ -1,3 +1,4 @@
+import json
 import os
 import platform
 
@@ -72,8 +73,25 @@ class Ax3Pro:
         pg = self.browser.page_source
         soup = BeautifulSoup(pg, 'html.parser')
         pg = soup.find_all('body')[0].text
+        return pg
 
-        metrics_network.to_metric(pg)
+
+    def get_metrics(self, hosts:str, wan:str = None):
+
+        if wan:
+            hosts = json.loads(hosts)
+            wan = json.loads(wan)
+            hosts.append(
+                    {
+                        "HostName": "Wan",
+                        "ActualName": "Wan",
+                        "ID": "wan-port-internet",
+                        "TxKBytes": wan["UpBandwidth"],
+                        "RxKBytes": wan["DownBandwidth"],
+                    }
+            )
+
+        metrics_network.to_metric(json.dumps(hosts))
 
         return metrics_network.format()
 

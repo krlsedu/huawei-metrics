@@ -35,7 +35,9 @@ def health():
 @app.route('/prometheus-metrics')
 def metrics():  # put application's code here
     try:
-        scrape = ax3_pro.scrape("/api/system/HostInfo")
+        hosts = ax3_pro.scrape("/api/system/HostInfo")
+        wan = ax3_pro.scrape("/api/ntwk/wan?type=active")
+        scrape = ax3_pro.get_metrics(hosts, wan)
         return scrape, 200, {'Content-Type': 'text/plain; version=0.0.4; charset=utf-8'}
     except Exception as e:
         global DATA_VALID

@@ -1,0 +1,31 @@
+# --- Git e IDEs (Lixo de desenvolvimento) ---
+.git
+.idea
+.vscode
+.gitignore
+
+# --- Ambiente Virtual e Python (Lixo de execução) ---
+# NUNCA copie a venv do Windows pro Linux, quebra tudo!
+.venv
+venv
+env
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# --- Logs e Temporários ---
+*.log
+tmp
+temp
+
+# --- Segurança (CRÍTICO) ---
+# Nunca leve suas senhas locais para dentro da imagem
+.env
+
+# --- Scripts e Documentação (Desnecessários na imagem) ---
+runner.bat
+README.md
+docker-compose.yml
+Dockerfile
+.dockerignore
