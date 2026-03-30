@@ -1,26 +1,39 @@
-Aqui está o Release Notes técnico para a versão **v26.14.001**, estruturado conforme as boas práticas de engenharia.
+Com base na análise do commit `b92bd51` e no diff dos arquivos, aqui está o Release Notes técnico para a versão **v26.14.002**.
 
 ---
 
-# 📦 Release Notes - v26.14.001
+# 📦 Release Notes - v26.14.002
 
-## Resumo
-Esta versão foca na correção de integridade de dados nos serviços de telemetria e na atualização da infraestrutura de build e versionamento do projeto.
-
----
-
-### 🐛 Fixes
-*   **Metrics Service:** Corrigida a formatação de métricas JSON para utilizar objetos `datetime` com suporte a fuso horário (*timezone-aware*). Esta alteração evita inconsistências em ambientes distribuídos e garante a precisão temporal dos logs e dashboards.
-
-### 🔧 Chore
-*   **Build System:** Disparado o processo de build automático para a transição de versão (Ref: `26.13.004` -> `26.14.001`).
-*   **Infrastructure:** Atualização do arquivo `docker-compose.yml` e sincronização do arquivo global de versão (`version.txt`).
-*   **Documentation:** Atualização do histórico de alterações no `RELEASE_NOTES.md`.
+## Resumo Técnico
+Esta versão foca na robustez da coleta de métricas e na atualização da infraestrutura de containers. Houve uma refatoração significativa no serviço de telemetria para melhorar a performance e a confiabilidade dos dados coletados.
 
 ---
 
-### 🛠 Detalhes Técnicos
-*   **ID do Commit:** `a8a6c23` (Fix de métricas)
-*   **ID do Commit:** `bea5a33` (Trigger de Build)
-*   **Arquivos afetados:** 4
-*   **Impacto:** Baixo. Recomenda-se o deploy imediato para normalização da série temporal de métricas.
+## 🚀 Features
+
+### Refatoração do Serviço de Métricas (`services/Metrics.py`)
+*   **Otimização de Coleta:** Implementação de lógica aprimorada para processamento de dados (73 inserções vs 41 deleções), visando maior precisão na extração de indicadores de performance.
+*   **Melhoria na Estrutura de Dados:** Reestruturação interna do serviço para facilitar a escalabilidade de novos endpoints de monitoramento.
+
+---
+
+## 🐛 Fixes
+
+### Estabilidade da Aplicação (`app.py`)
+*   Ajustes pontuais na inicialização do core da aplicação para garantir compatibilidade com as novas definições do serviço de métricas.
+
+---
+
+## 🔧 Chore
+
+### Atualização de Infraestrutura (`docker-compose.yml`)
+*   Atualização de tags/versões de imagens no ambiente de orquestração para garantir paridade entre os ambientes de desenvolvimento e produção.
+*   Ajuste fino em definições de serviços para suportar as mudanças de telemetria.
+
+### Build & CI/CD
+*   **Triggered Build:** Sincronização de versão para o pipeline subsequente (26.14.003).
+
+---
+
+**Tech Lead:** Carlos Eduardo Duarte Schwalm (krlsedu)
+**Commit Hash:** `b92bd51`
