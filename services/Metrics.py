@@ -24,25 +24,25 @@ class PrometheusMetric:
         self.hosts = {}
         self.directions = {}
         self.is_valid = True
-        self.scrape_atual = 0  # Inicializa a rodada
+        self.current_scrape = 0  # Initializes the current scraping round
 
     def to_metric(self, text):
         json_array = json.loads(text)
 
-        # Grava a hora exata dessa rodada (em segundos)
-        self.scrape_atual = time.time_ns() // 1000000000
+        # Records the exact time of this scrape (in seconds)
+        self.current_scrape = time.time_ns() // 1000000000
 
         for json_item in json_array:
             host_ = json_item.get('ActualName', '')
             if host_ == "":
                 host_ = json_item.get('HostName', '')
 
-            id_ = json_item.get('ID', 'sem_id')
-            ##replace - for _ and . for _
+            id_ = json_item.get('ID', 'no_id')
+            # replace - for _ and . for _
             id_ = id_.replace("-", "_").replace(".", "_")
 
             if host_ == "":
-                host_ = f"Desconhecido_{id_}"
+                host_ = f"Unknown_{id_}"
 
             tx = float(json_item.get('TxKBytes', 0))
             rx = float(json_item.get('RxKBytes', 0))
@@ -51,40 +51,50 @@ class PrometheusMetric:
             self.add(id_, "rx", rx, host_)
 
     def add(self, label, direction, value, host=None):
-        # Puxa o carimbo da rodada atual
-        ns = self.scrape_atual
+        # Gets the timestamp of the current round
+        ns = self.current_scrape
 
-        # --- DESVIO DA WAN ---
+        # --- WAN DEVIATION ---
         if host == "Wan":
-            rate_label = label + "_" + direction + '_rate'
-            sum_label = label + "_" + direction + '_sum'
+            rate_label = f"{label}_{direction}_rate"
+            sum_label = f"{label}_{direction}_sum"
+            count_label = f"{label}_{direction}_count"
 
             if rate_label in self.timestamps:
                 delta_time = ns - self.timestamps[rate_label]
-                trafego_estimado = value * delta_time
+                estimated_traffic = value * delta_time
             else:
-                trafego_estimado = 0
+                estimated_traffic = 0
 
+            # Update Rate (Speed)
             self.values[rate_label] = value
             self.timestamps[rate_label] = ns
             self.hosts[rate_label] = host
             self.directions[rate_label] = direction
 
-            self.values[sum_label] = self.values.get(sum_label, 0) + trafego_estimado
+            # Update Sum (Total accumulated)
+            self.values[sum_label] = self.values.get(sum_label, 0) + estimated_traffic
             self.timestamps[sum_label] = ns
             self.hosts[sum_label] = host
             self.directions[sum_label] = direction
+
+            # Update Count (Exact traffic in this interval)
+            self.values[count_label] = estimated_traffic
+            self.timestamps[count_label] = ns
+            self.hosts[count_label] = host
+            self.directions[count_label] = direction
+
             return
 
-        # --- LÓGICA DA LAN ---
-        sum_ = label + "_" + direction + '_sum'
-        count_ = label + "_" + direction + '_count'
-        rate_ = label + "_" + direction + '_rate'
+        # --- LAN LOGIC ---
+        sum_ = f"{label}_{direction}_sum"
+        count_ = f"{label}_{direction}_count"
+        rate_ = f"{label}_{direction}_rate"
 
         value_ = self.values.get(sum_)
 
         if value_ is None:
-            # Primeira leitura do aparelho
+            # First reading of the device
             self.values[count_] = 0
             self.values[sum_] = value
             self.values[rate_] = 0.0
@@ -93,18 +103,19 @@ class PrometheusMetric:
             self.timestamps[count_] = ns
             self.timestamps[rate_] = ns
 
-            # AGORA SIM! Carimba o host e a direção nas três variáveis
+            # Tag host and direction in all three variables
             for l in [sum_, count_, rate_]:
                 self.hosts[l] = host
                 self.directions[l] = direction
         else:
             if value == value_:
-                # O valor não mudou, a gente encerra a função AQUI
-                # sem atualizar a data!
+                # Value hasn't changed, exit function without updating date!
                 return
             else:
-                # O roteador atualizou os dados
+                # Router updated the data
                 delta_time = ns - self.timestamps.get(sum_, ns)
+
+                # Delta between old and new reading
                 self.values[count_] = value - value_
 
                 if delta_time > 0:
@@ -114,7 +125,7 @@ class PrometheusMetric:
 
                 self.values[sum_] = value
 
-                # Carimba a data nova pois teve tráfego
+                # Update timestamp since there was traffic
                 self.timestamps[sum_] = ns
                 self.timestamps[count_] = ns
                 self.timestamps[rate_] = ns
@@ -125,63 +136,63 @@ class PrometheusMetric:
             host_ = self.hosts[label]
             direction_ = self.directions[label]
             if label.endswith("_rate"):
-                result.append('#HELP ' + self.name + ' ' + self.description + ' - gauge')
+                result.append(f'#HELP {self.name} {self.description} - gauge')
                 result.append(
                     f'huawei_{self.name}_rate{{host="{host_}", direction="{direction_}", unit="Kbps"}} {value * 8}')
             elif label.endswith("_count"):
-                result.append('#HELP ' + self.name + ' ' + self.description + ' - counter')
+                result.append(f'#HELP {self.name} {self.description} - counter')
                 result.append(
                     f'huawei_{self.name}_count{{host="{host_}", direction="{direction_}",unit="KBytes"}} {value}')
             else:
-                result.append('#HELP ' + self.name + ' ' + self.description + ' - sum')
+                result.append(f'#HELP {self.name} {self.description} - sum')
                 result.append(
                     f'huawei_{self.name}_sum{{host="{host_}", direction="{direction_}",unit="KBytes"}} {value}')
         result = '\n'.join(result)
         return result
 
     def format_as_json(self):
-        # Pega a hora exata desse lote de métricas (mantendo o padrão UTC)
-        agora = datetime.datetime.now(datetime.timezone.utc)
+        # Exact time of this batch of metrics (maintaining UTC standard)
+        now = datetime.datetime.now(datetime.timezone.utc)
 
-        # Dicionário temporário pra agrupar as coisas
-        agrupado = {}
+        # Temporary dictionary to group things
+        grouped_data = {}
 
         for label, value in self.values.items():
-            # FILTRO MÁGICO: Só pega as métricas que foram carimbadas na rodada atual
-            if self.timestamps.get(label) != getattr(self, 'scrape_atual', 0):
+            # FILTER: Only get metrics stamped in the current round
+            if self.timestamps.get(label) != getattr(self, 'current_scrape', 0):
                 continue
 
-            # Puxa o host e a direção (tx ou rx)
-            host_ = self.hosts.get(label, "Desconhecido")
+            # Get host and direction (tx or rx)
+            host_ = self.hosts.get(label, "Unknown")
             direction_ = self.directions.get(label, "")
 
-            # Se o host ainda não tá no nosso dicionário, cria uma casinha pra ele
-            if host_ not in agrupado:
-                agrupado[host_] = {}
+            # If the host is not in our dictionary yet, create a space for it
+            if host_ not in grouped_data:
+                grouped_data[host_] = {}
 
-            # Batiza a chave que vai ficar dentro do JSON e ajusta a matemática
+            # Set the key name that will be inside the JSON and adjust math
             if label.endswith("_rate"):
-                chave = f"{direction_}_rate_kbps"
+                key = f"{direction_}_rate_kbps"
                 val = value * 8
             elif label.endswith("_count"):
-                chave = f"{direction_}_count_kb"
+                key = f"{direction_}_interval_traffic_kb"
                 val = value
             else:
-                chave = f"{direction_}_sum_kb"
+                key = f"{direction_}_total_accumulated_kb"
                 val = value
 
-            # Joga o dado lá pra dentro do dicionário do host
-            agrupado[host_][chave] = val
+            # Put the data inside the host's dictionary
+            grouped_data[host_][key] = val
 
-        # Agora transforma esse grupão num array de dicionários pro teu insert
+        # Transform this group into an array of dictionaries for insertion
         result = []
-        for host, dados_dict in agrupado.items():
-            if dados_dict: # Garante que não manda host vazio
+        for host, data_dict in grouped_data.items():
+            if data_dict:  # Ensures empty hosts aren't sent
                 result.append({
-                    "timestamp": agora,
+                    "timestamp": now,
                     "host": host,
-                    # O json.dumps aqui é o que vai gerar a string que vai pra coluna "dados"
-                    "dados": json.dumps(dados_dict)
+                    # json.dumps generates the string for the 'data' column
+                    "data": json.dumps(data_dict)
                 })
 
         return result
