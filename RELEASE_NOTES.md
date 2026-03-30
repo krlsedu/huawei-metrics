@@ -1,30 +1,30 @@
-Aqui está o Release Notes técnico para a versão **v26.14.005**, estruturado conforme as boas práticas de engenharia.
+Aqui está o Release Notes técnico para a versão **v26.14.006**, focado em melhorias de infraestrutura e configurabilidade do monitoramento.
 
 ---
 
-# 📦 Release Notes - v26.14.005
+# Release Notes - v26.14.006
 
-## Resumo Técnico
-Esta versão foca na otimização da performance de coleta de dados (scraping) e na resiliência do sistema. A principal mudança é a desaceleração e o isolamento do processamento de rede WAN, garantindo que falhas externas não impactem o fluxo principal da aplicação.
+## Resumo
+Esta versão foca na refatoração do sistema de monitoramento em background, removendo valores fixos (*hardcoded*) e permitindo maior flexibilidade operacional através de variáveis de ambiente.
 
 ---
 
 ## 🚀 Features
-- **Isolamento de Thread para WAN:** Implementação de uma thread dedicada para o scraping de WAN. Isso evita gargalos no loop principal e permite que a coleta de dados de rede ocorra de forma assíncrona.
-- **Ajuste de Intervalo de Scraping:** O tempo de atualização do scraper foi ajustado para **5 segundos**, otimizando o consumo de recursos e evitando possíveis bloqueios por excesso de requisições.
+
+- **Configurabilidade de Intervalo de Monitoramento:** Implementada a capacidade de definir a duração do *sleep* no monitoramento via variável de ambiente `TIME_SLEEP`. Isso permite ajustes dinâmicos de performance sem necessidade de alteração no código-fonte.
+- **Injeção de Dependência de Configuração:** A função `monitorar_huawei_background` agora recebe explicitamente os parâmetros de tempo, melhorando a testabilidade e o controle do fluxo de execução.
 
 ## 🐛 Fixes
-- **Melhoria no Error Handling:** Refatoração da lógica de tratamento de exceções durante o processo de scraping, garantindo que erros pontuais de rede não causem o encerramento inesperado do serviço.
+
+- **Validação de Inicialização:** Adicionada verificação condicional para a existência da variável `TIME_SLEEP` antes do disparo da thread de background, prevenindo erros de execução ou loops inesperados caso a configuração esteja ausente.
 
 ## 🔧 Chore
-- **Update de Infraestrutura:** Atualização da imagem Docker para a versão `26.14.005` no arquivo `docker-compose.yml`.
-- **Refatoração de Código:** Limpeza e reestruturação do arquivo `app.py` para suporte à nova arquitetura multi-thread.
+
+- Refatoração do arquivo `app.py` para substituição de valores estáticos por variáveis dinâmicas.
 
 ---
 
-### 🛠 Detalhes Técnicos (Diff Stats)
-- **Arquivos alterados:** 2
-- **Inserções:** 23
-- **Deleções:** 16
-- **Commit ID:** `b82041f`
-- **Autor:** Carlos Eduardo Duarte Schwalm (krlsedu)
+### Detalhes Técnicos
+- **Commit Principal:** `e0a78d3`
+- **Arquivos Alterados:** `app.py`
+- **Autor:** Carlos Eduardo Duarte Schwalm
