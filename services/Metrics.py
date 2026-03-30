@@ -24,22 +24,37 @@ class PrometheusMetric:
         self.hosts = {}
         self.directions = {}
         self.is_valid = True
+        self.scrape_atual = 0  # Inicializa a rodada
 
     def to_metric(self, text):
         json_array = json.loads(text)
+
+        # Grava a hora exata dessa rodada (em segundos)
+        self.scrape_atual = time.time_ns() // 1000000000
+
         for json_item in json_array:
-            host_ = json_item['ActualName']
+            host_ = json_item.get('ActualName', '')
             if host_ == "":
-                host_ = json_item['HostName']
-            id_ = json_item['ID']
+                host_ = json_item.get('HostName', '')
+
+            id_ = json_item.get('ID', 'sem_id')
             ##replace - for _ and . for _
             id_ = id_.replace("-", "_").replace(".", "_")
-            self.add(id_, "tx", float(json_item['TxKBytes']), host_)
-            self.add(id_, "rx", float(json_item['RxKBytes']), host_)
+
+            if host_ == "":
+                host_ = f"Desconhecido_{id_}"
+
+            tx = float(json_item.get('TxKBytes', 0))
+            rx = float(json_item.get('RxKBytes', 0))
+
+            self.add(id_, "tx", tx, host_)
+            self.add(id_, "rx", rx, host_)
 
     def add(self, label, direction, value, host=None):
+        # Puxa o carimbo da rodada atual
+        ns = self.scrape_atual
 
-        ns = time.time_ns() // 1000000000
+        # --- DESVIO DA WAN ---
         if host == "Wan":
             rate_label = label + "_" + direction + '_rate'
             sum_label = label + "_" + direction + '_sum'
@@ -59,39 +74,51 @@ class PrometheusMetric:
             self.timestamps[sum_label] = ns
             self.hosts[sum_label] = host
             self.directions[sum_label] = direction
-
             return
 
+        # --- LÓGICA DA LAN ---
         sum_ = label + "_" + direction + '_sum'
         count_ = label + "_" + direction + '_count'
-        try:
-            value_ = self.values[sum_]
-        except:
-            value_ = None
+        rate_ = label + "_" + direction + '_rate'
+
+        value_ = self.values.get(sum_)
+
         if value_ is None:
+            # Primeira leitura do aparelho
             self.values[count_] = 0
-        else:
-            self.values[count_] = value - value_
-        self.values[sum_] = value
-        self.timestamps[sum_] = ns
-        self.timestamps[count_] = ns
-        self.hosts[sum_] = host
-        self.hosts[count_] = host
-        self.directions[sum_] = direction
-        self.directions[count_] = direction
-        self.rate(label + "_" + direction + '_rate', direction, value, ns, host, value_)
+            self.values[sum_] = value
+            self.values[rate_] = 0.0
 
-    def rate(self, label, direction, value, timestamp, host=None, value_=None):
-        if label not in self.values:
-            self.values[label] = 0
-            self.timestamps[label] = timestamp
-            self.hosts[label] = host
-            self.directions[label] = direction
-        else:
-            self.values[label] = (value - value_) / (timestamp - self.timestamps[label])
-            self.timestamps[label] = timestamp
+            self.timestamps[sum_] = ns
+            self.timestamps[count_] = ns
+            self.timestamps[rate_] = ns
 
-    # create metod to formar the output in prometheus format
+            # AGORA SIM! Carimba o host e a direção nas três variáveis
+            for l in [sum_, count_, rate_]:
+                self.hosts[l] = host
+                self.directions[l] = direction
+        else:
+            if value == value_:
+                # O valor não mudou, a gente encerra a função AQUI
+                # sem atualizar a data!
+                return
+            else:
+                # O roteador atualizou os dados
+                delta_time = ns - self.timestamps.get(sum_, ns)
+                self.values[count_] = value - value_
+
+                if delta_time > 0:
+                    self.values[rate_] = (value - value_) / delta_time
+                else:
+                    self.values[rate_] = 0.0
+
+                self.values[sum_] = value
+
+                # Carimba a data nova pois teve tráfego
+                self.timestamps[sum_] = ns
+                self.timestamps[count_] = ns
+                self.timestamps[rate_] = ns
+
     def format(self):
         result = []
         for label, value in self.values.items():
@@ -120,6 +147,10 @@ class PrometheusMetric:
         agrupado = {}
 
         for label, value in self.values.items():
+            # FILTRO MÁGICO: Só pega as métricas que foram carimbadas na rodada atual
+            if self.timestamps.get(label) != getattr(self, 'scrape_atual', 0):
+                continue
+
             # Puxa o host e a direção (tx ou rx)
             host_ = self.hosts.get(label, "Desconhecido")
             direction_ = self.directions.get(label, "")
@@ -145,11 +176,12 @@ class PrometheusMetric:
         # Agora transforma esse grupão num array de dicionários pro teu insert
         result = []
         for host, dados_dict in agrupado.items():
-            result.append({
-                "timestamp": agora,
-                "host": host,
-                # O json.dumps aqui é o que vai gerar a string que vai pra coluna "dados"
-                "dados": json.dumps(dados_dict)
-            })
+            if dados_dict: # Garante que não manda host vazio
+                result.append({
+                    "timestamp": agora,
+                    "host": host,
+                    # O json.dumps aqui é o que vai gerar a string que vai pra coluna "dados"
+                    "dados": json.dumps(dados_dict)
+                })
 
         return result

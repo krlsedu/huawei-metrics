@@ -54,7 +54,7 @@ def monitorar_huawei_background():
             DATA_VALID = False
 
         # Dorme 2 segundos cravados até a próxima leitura
-        time.sleep(2)
+        time.sleep(5)
 
 @app.route('/health')
 def health():

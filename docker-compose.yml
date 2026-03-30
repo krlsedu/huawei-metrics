@@ -4,7 +4,7 @@ services:
   huawei_metrics:
     container_name: huawei_metrics
     hostname: huawei_metrics
-    image: krlsedu/huawei-metrics:26.13.007
+    image: krlsedu/huawei-metrics:26.14.003
     environment:
       HUAWEI_HOST: 192.168.15.1
       HUAWEI_USER: admin
