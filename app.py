@@ -112,6 +112,7 @@ def deviceinfo():
 if __name__ == '__main__':
     # Cria a thread separada pra não trancar o Flask
     time_sleep = os.getenv('TIME_SLEEP', 5)
+    time_sleep = int(time_sleep)
     if time_sleep > 0:
         thread_huawei = threading.Thread(target=monitorar_huawei_background, args=(time_sleep,), daemon=True)
         thread_huawei.start()
