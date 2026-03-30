@@ -32,7 +32,7 @@ class ClickHouseDb:
             CREATE TABLE IF NOT EXISTS network_metrics (
                 timestamp DateTime64(3, 'UTC') DEFAULT now64(3, 'UTC') CODEC(DoubleDelta, ZSTD(1)),
                 host String CODEC(ZSTD(3)),
-                dados String CODEC(ZSTD(9))
+                data String CODEC(ZSTD(9))
             ) ENGINE = MergeTree()
             ORDER BY (host, timestamp)
             """)
@@ -51,13 +51,13 @@ class ClickHouseDb:
                 rows.append([
                     m["timestamp"],
                     m["host"],
-                    m["dados"]
+                    m["data"]
                 ])
 
             _client.insert(
                 "network_metrics",
                 rows,
-                column_names=["timestamp", "host", "dados"],
+                column_names=["timestamp", "host", "data"],
             )
             _client.close()
         except Exception as e:
