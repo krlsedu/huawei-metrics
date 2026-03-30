@@ -41,7 +41,7 @@ def monitorar_huawei_background(time_sleep: int = 5):
         except Exception as e:
             app.logger.error(f"Erro na coleta de background: {e}")
         
-        time.sleep(5)
+        time.sleep(time_sleep)
 
 def scrape_wan(click_house: ClickHouseDb, ax3_pro: Ax3Pro):
     global DATA_VALID
