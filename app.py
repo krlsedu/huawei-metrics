@@ -1,3 +1,4 @@
+import os
 import time
 import threading
 import decimal
@@ -29,7 +30,7 @@ DATA_VALID = True
 
 
 # --- LOOP EM BACKGROUND (HUAWEI -> CLICKHOUSE) ---
-def monitorar_huawei_background():
+def monitorar_huawei_background(time_sleep: int = 5):
     click_house = ClickHouseDb()
 
     while True:
@@ -39,7 +40,7 @@ def monitorar_huawei_background():
 
         except Exception as e:
             app.logger.error(f"Erro na coleta de background: {e}")
-
+        
         time.sleep(5)
 
 def scrape_wan(click_house: ClickHouseDb, ax3_pro: Ax3Pro):
@@ -110,7 +111,8 @@ def deviceinfo():
 
 if __name__ == '__main__':
     # Cria a thread separada pra não trancar o Flask
-    thread_huawei = threading.Thread(target=monitorar_huawei_background, daemon=True)
+    time_sleep = os.getenv('TIME_SLEEP', 5)
+    thread_huawei = threading.Thread(target=monitorar_huawei_background, args=(time_sleep,), daemon=True)
     thread_huawei.start()
 
     # Roda o Flask pra servir as rotas e o healthcheck
