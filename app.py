@@ -112,8 +112,9 @@ def deviceinfo():
 if __name__ == '__main__':
     # Cria a thread separada pra não trancar o Flask
     time_sleep = os.getenv('TIME_SLEEP', 5)
-    thread_huawei = threading.Thread(target=monitorar_huawei_background, args=(time_sleep,), daemon=True)
-    thread_huawei.start()
+    if time_sleep > 0:
+        thread_huawei = threading.Thread(target=monitorar_huawei_background, args=(time_sleep,), daemon=True)
+        thread_huawei.start()
 
     # Roda o Flask pra servir as rotas e o healthcheck
     app.run(host='0.0.0.0', port=5000)
