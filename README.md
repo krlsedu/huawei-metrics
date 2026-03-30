@@ -4,122 +4,95 @@
 
 ## Description
 
-This project is a Prometheus exporter for Huawei, specifically designed and tested for AX3 Pro routers. It uses Selenium
-with PhantomJS for authentication and interaction with the router's APIs. The exporter is ready for use with Docker
-through the project's Dockerfile. This is in the initial development stage and refining is still needed.
+This project is a Prometheus exporter for Huawei routers, specifically designed and tested for the AX3 Pro model. It collects network traffic metrics (LAN and WAN) and exposes them in Prometheus format.
+
+The exporter can also run a background task to periodically save metrics into a ClickHouse database.
+
+## Features
+
+- **Prometheus Metrics**: Exposes real-time traffic data for all connected devices and the WAN interface.
+- **ClickHouse Integration**: Optional background task to persist metrics for long-term analysis.
+- **Docker Ready**: Easily deployable using Docker or Docker Compose.
+- **Automated Authentication**: Uses Selenium with PhantomJS to handle router login and data scraping.
+
+## Configuration
 
 Environment variables are used for configuration:
 
-* `HUAWEI_HOST`: Set this to the URL of your router.
-* `HUAWEI_USER`: Set this to the username.
-* `HUAWEI_PASSWORD`: Set this to the password.
+- `HUAWEI_HOST`: Router IP or hostname (e.g., `192.168.3.1`).
+- `HUAWEI_USER`: Router admin username.
+- `HUAWEI_PASSWORD`: Router admin password.
+- `TIME_SLEEP`: Interval in seconds for the background ClickHouse collection (default: `5`). Set to `0` to disable background collection.
+- `CH_HOST`, `CH_PORT`, `CH_USER`, `CH_PASS`, `CH_DB`: ClickHouse connection details.
 
-### Known Issues
+## API Endpoints
 
-1) If data is fetched at very short intervals (i.e., less than 10 seconds), the data is not updated.
-2) Even if the update frequency is every 30 seconds, a zero-read occurs every 5 minutes. This issue is under
-   investigation.
-3) A more elegant method of connecting and authorizing is needed - this project is currently still in the POC (proof of
-   concept) stage.
-4) A more elegant method to generate the metrics
+- `GET /prometheus-metrics`: Returns metrics in Prometheus text format.
+- `GET /json-metrics`: Returns metrics in JSON format.
+- `GET /deviceinfo`: Returns basic router device information.
+- `GET /health`: Health check endpoint. Returns `200 OK` if the last scrape was successful.
 
 ## Prerequisites
 
-Ensure you have Python version 3.9.13 and pip, the Python package installer.
+- Python 3.9.13
+- PhantomJS (included in the Docker image)
 
-## Installation
+## Installation & Execution
 
-To install necessary packages, run:
+### Local Installation
 
-```bash
-pip install -r requirements.txt
-```
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Run the application:
+   ```bash
+   python app.py
+   ```
 
-## Execution
-```bash
-python app.py
-```
+### Docker
 
-## Docker session
-## Building Docker Image
+1. Build the image:
+   ```bash
+   docker build -t huawei-prometheus-exporter .
+   ```
+2. Run with environment variables:
+   ```bash
+   docker run -d \
+     -e HUAWEI_HOST=192.168.3.1 \
+     -e HUAWEI_USER=admin \
+     -e HUAWEI_PASSWORD=yourpassword \
+     -p 5000:5000 \
+     huawei-prometheus-exporter
+   ```
+   Or use `docker-compose up -d`.
 
-The Dockerfile for this project is included. To build a Docker image, use the following command:
+## Prometheus Configuration
 
-```bash
-docker build -t huawei-prometheus-exporter .
-```
-the base image is krlsedu/csctracker-ubuntu:latest
-from the following project:
-https://github.com/krlsedu/CscTrackerUbuntu
-is based on ubuntu 20.04 for compatibilite with phantomjs and includes the following packages:
-1) python3.9
-2) python3-pip
-3) phantomjs
-
-
-## Docker Execution
-
-You can run the Docker image as follows, replacing `<env>` with your actual environment variables:
-
-```bash
-docker run -e HUAWEI_HOST=  -e HUAWEI_USER=  -e HUAWEI_PASSWORD=  huawei-prometheus-exporter
-```
-or
-
-```bash
-docker compose up -d
-```
-
-## Usage
-
-To use this exporter, you need to add the following to your Prometheus configuration:
+Add the following to your `prometheus.yml`:
 
 ```yaml
-  - job_name: 'Huawei exporter'
+scrape_configs:
+  - job_name: 'huawei-exporter'
+    static_configs:
+      - targets: ['localhost:5000']
     metrics_path: '/prometheus-metrics'
     scrape_interval: 30s
-    static_configs:
-      - targets: [ 'huawei_metrics:5000' ]
-```
-
-## Metrics
-
-metrics are available at the following endpoint: `/prometheus-metrics`
-example:
-
-```text
-#HELP network_traffic Network traffic - counter
-huawei_network_traffic_count{host="Host_name", direction="tx",unit="KBytes"} 70821.0
-#HELP network_traffic Network traffic - sum
-huawei_network_traffic_sum{host="Host_name", direction="tx",unit="KBytes"} 1844131.0
-#HELP network_traffic Network traffic - gauge
-huawei_network_traffic_rate{host="Host_name", direction="tx", unit="Kbps"} 3585.8734177215188
-#HELP network_traffic Network traffic - counter
-huawei_network_traffic_count{host="Host_name", direction="rx",unit="KBytes"} 9739.0
-#HELP network_traffic Network traffic - sum
-huawei_network_traffic_sum{host="Host_name", direction="rx",unit="KBytes"} 6139978.0
-#HELP network_traffic Network traffic - gauge
-huawei_network_traffic_rate{host="Host_name", direction="rx", unit="Kbps"} 493.11392405063293
 ```
 
 ## Grafana Dashboard
-Import the dashboard from the file `grafana_dashboard.json` into your Grafana instance.
 
-in the dashboard, you can see the following metrics:
-1) Internet usage in Kbps - obtained from the router's API whith the following project:
-https://github.com/krlsedu/dd-wrt-prometheus-exporter adapted from the following project:
-https://github.com/Enrico204/dd-wrt-prometheus-exporter
+An example dashboard is provided in `grafana_dashboard.json`. It includes:
+1. Internet usage (WAN).
+2. Local network (LAN) usage.
+3. Traffic per host.
+4. Total traffic download/upload.
 
-2) Local network usage in Kbps - obtained from the router's API whith this project.
-3) Local network usage in Kbps by hosts - obtained from the router's API whith this project.
-4) Total traffic download in KBytes by hosts - obtained from the router's API whith this project.
-5) Total traffic upload in KBytes by hosts - obtained from the router's API whith this project.
-6) Total traffic in KBytes - obtained from the router's API whith this project.
+## Known Issues
 
-## Help
-
-If you have any questions or encountered any issues, feel free to open an issue in this repository.
+1. Data may not update if scraped at intervals shorter than 10 seconds.
+2. Occasional zero-reads every 5 minutes (under investigation).
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+MIT License - see the `LICENSE` file for details.

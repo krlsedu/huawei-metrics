@@ -29,8 +29,8 @@ metrics = PrometheusMetrics(app, group_by='endpoint', default_labels={'applicati
 DATA_VALID = True
 
 
-# --- LOOP EM BACKGROUND (HUAWEI -> CLICKHOUSE) ---
-def monitorar_huawei_background(time_sleep: int = 5):
+# --- BACKGROUND LOOP (HUAWEI -> CLICKHOUSE) ---
+def monitor_huawei_background(time_sleep: int = 5):
     click_house = ClickHouseDb()
 
     while True:
@@ -39,29 +39,29 @@ def monitorar_huawei_background(time_sleep: int = 5):
             _thread.start()
 
         except Exception as e:
-            app.logger.error(f"Erro na coleta de background: {e}")
+            app.logger.error(f"Background collection error: {e}")
         
         time.sleep(time_sleep)
 
 def scrape_wan(click_house: ClickHouseDb, ax3_pro: Ax3Pro):
     global DATA_VALID
     try:
-        # 1. Faz a raspagem do roteador
+        # 1. Scrapes the router
         hosts = ax3_pro.scrape("/api/system/HostInfo")
         wan = ax3_pro.scrape("/api/ntwk/wan?type=active")
 
-        lista_formatada = ax3_pro.get_metrics(hosts, wan, True)
+        formatted_list = ax3_pro.get_metrics(hosts, wan, True)
 
-        if lista_formatada:
-            if isinstance(lista_formatada, str):
-                lista_formatada = json.loads(lista_formatada)
+        if formatted_list:
+            if isinstance(formatted_list, str):
+                formatted_list = json.loads(formatted_list)
 
-            click_house.save_network_metrics(lista_formatada)
+            click_house.save_network_metrics(formatted_list)
 
         DATA_VALID = True
 
     except Exception as e:
-        app.logger.error(f"Erro na coleta de background: {e}")
+        app.logger.error(f"Background collection error: {e}")
         DATA_VALID = False
 
 @app.route('/health')
@@ -110,12 +110,12 @@ def deviceinfo():
 
 
 if __name__ == '__main__':
-    # Cria a thread separada pra não trancar o Flask
+    # Create separate thread to not block Flask
     time_sleep = os.getenv('TIME_SLEEP', 5)
     time_sleep = int(time_sleep)
     if time_sleep > 0:
-        thread_huawei = threading.Thread(target=monitorar_huawei_background, args=(time_sleep,), daemon=True)
+        thread_huawei = threading.Thread(target=monitor_huawei_background, args=(time_sleep,), daemon=True)
         thread_huawei.start()
 
-    # Roda o Flask pra servir as rotas e o healthcheck
+    # Run Flask to serve routes and healthcheck
     app.run(host='0.0.0.0', port=5000)

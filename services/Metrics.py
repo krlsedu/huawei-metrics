@@ -38,7 +38,7 @@ class PrometheusMetric:
                 host_ = json_item.get('HostName', '')
 
             id_ = json_item.get('ID', 'no_id')
-            # replace - for _ and . for _
+            # Replace - with _ and . with _
             id_ = id_.replace("-", "_").replace(".", "_")
 
             if host_ == "":

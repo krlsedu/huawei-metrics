@@ -39,7 +39,7 @@ class ClickHouseDb:
 
             _client.close()
         except Exception as e:
-            logging.error(f"Falha ao inicializar banco: {e}")
+            logging.error(f"Failed to initialize database: {e}")
 
 
     def save_network_metrics(self, metrics_list):
@@ -61,4 +61,4 @@ class ClickHouseDb:
             )
             _client.close()
         except Exception as e:
-            logging.error(f"Falha ao salvar métricas de rede: {e}")
+            logging.error(f"Failed to save network metrics: {e}")
