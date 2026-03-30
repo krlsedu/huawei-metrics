@@ -1,30 +1,27 @@
-Aqui está o Release Notes técnico para a versão **v26.14.006**, focado em melhorias de infraestrutura e configurabilidade do monitoramento.
+Aqui está o Release Notes técnico para a versão **v26.14.007**, focado em estabilidade e correção de tipos no ambiente de execução.
 
 ---
 
-# Release Notes - v26.14.006
+# 📝 Release Notes - v26.14.007
 
 ## Resumo
-Esta versão foca na refatoração do sistema de monitoramento em background, removendo valores fixos (*hardcoded*) e permitindo maior flexibilidade operacional através de variáveis de ambiente.
+Esta versão foca na correção de um erro de tipagem na inicialização de threads, garantindo que as configurações de ambiente sejam interpretadas corretamente pelo runtime do Python.
 
 ---
-
-## 🚀 Features
-
-- **Configurabilidade de Intervalo de Monitoramento:** Implementada a capacidade de definir a duração do *sleep* no monitoramento via variável de ambiente `TIME_SLEEP`. Isso permite ajustes dinâmicos de performance sem necessidade de alteração no código-fonte.
-- **Injeção de Dependência de Configuração:** A função `monitorar_huawei_background` agora recebe explicitamente os parâmetros de tempo, melhorando a testabilidade e o controle do fluxo de execução.
 
 ## 🐛 Fixes
 
-- **Validação de Inicialização:** Adicionada verificação condicional para a existência da variável `TIME_SLEEP` antes do disparo da thread de background, prevenindo erros de execução ou loops inesperados caso a configuração esteja ausente.
+- **Tratamento de Variáveis de Ambiente (`app.py`):**
+    - Corrigido bug onde a variável `TIME_SLEEP` era lida como *string* (padrão do OS), causando falhas na criação de threads.
+    - Implementada a conversão explícita para `integer` antes do uso, garantindo a compatibilidade com as funções de temporização do sistema.
 
 ## 🔧 Chore
 
-- Refatoração do arquivo `app.py` para substituição de valores estáticos por variáveis dinâmicas.
+- **Refatoração de Código:** Pequeno ajuste técnico no arquivo principal para aumentar a resiliência do carregamento de configurações.
 
 ---
 
-### Detalhes Técnicos
-- **Commit Principal:** `e0a78d3`
-- **Arquivos Alterados:** `app.py`
+### 🛠 Detalhes Técnicos
+- **Commit:** `47c5ec2`
+- **Arquivos alterados:** `app.py` (+1 linha)
 - **Autor:** Carlos Eduardo Duarte Schwalm
