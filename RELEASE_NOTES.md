@@ -1,34 +1,26 @@
-Aqui está o Release Notes técnico para a versão **v26.13.004**, focado em clareza e impacto técnico.
+Aqui está o Release Notes técnico para a versão **v26.14.001**, estruturado conforme as boas práticas de engenharia.
 
 ---
 
-# 📝 Release Notes - v26.13.004
+# 📦 Release Notes - v26.14.001
 
 ## Resumo
-Esta versão foca na correção da serialização de métricas, garantindo a integridade dos dados temporais ao adotar objetos datetime com fuso horário (timezone-aware).
+Esta versão foca na correção de integridade de dados nos serviços de telemetria e na atualização da infraestrutura de build e versionamento do projeto.
 
 ---
 
-## 🐛 Fixes
+### 🐛 Fixes
+*   **Metrics Service:** Corrigida a formatação de métricas JSON para utilizar objetos `datetime` com suporte a fuso horário (*timezone-aware*). Esta alteração evita inconsistências em ambientes distribuídos e garante a precisão temporal dos logs e dashboards.
 
-### Core / Metrics Service
-- **Correção na formatação de métricas JSON:** Ajustada a lógica de serialização no serviço de métricas para utilizar objetos `datetime` com informação de fuso horário. 
-    - **Impacto:** Resolve problemas de inconsistência em dashboards e ferramentas de monitoramento que dependem de precisão temporal (UTC vs Local Time).
-    - **Arquivo afetado:** `services/Metrics.py`
-
----
-
-## 🚀 Features
-*Nenhuma nova funcionalidade foi introduzida nesta versão.*
+### 🔧 Chore
+*   **Build System:** Disparado o processo de build automático para a transição de versão (Ref: `26.13.004` -> `26.14.001`).
+*   **Infrastructure:** Atualização do arquivo `docker-compose.yml` e sincronização do arquivo global de versão (`version.txt`).
+*   **Documentation:** Atualização do histórico de alterações no `RELEASE_NOTES.md`.
 
 ---
 
-## 🔧 Chore
-*Nenhuma tarefa de manutenção ou infraestrutura foi registrada nesta versão.*
-
----
-
-**Informações Técnicas:**
-- **Commit:** `a8a6c23`
-- **Autor:** Carlos Eduardo Duarte Schwalm (krlsedu)
-- **Data de Referência:** 2026
+### 🛠 Detalhes Técnicos
+*   **ID do Commit:** `a8a6c23` (Fix de métricas)
+*   **ID do Commit:** `bea5a33` (Trigger de Build)
+*   **Arquivos afetados:** 4
+*   **Impacto:** Baixo. Recomenda-se o deploy imediato para normalização da série temporal de métricas.
