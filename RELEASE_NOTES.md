@@ -1,27 +1,31 @@
-Aqui está o Release Notes técnico para a versão **v26.14.007**, focado em estabilidade e correção de tipos no ambiente de execução.
+Aqui está o Release Notes técnico para a versão **v26.14.008**, focado em clareza e manutenção do código.
 
 ---
 
-# 📝 Release Notes - v26.14.007
+# 📝 Release Notes - v26.14.008
 
-## Resumo
-Esta versão foca na correção de um erro de tipagem na inicialização de threads, garantindo que as configurações de ambiente sejam interpretadas corretamente pelo runtime do Python.
+## 📋 Visão Geral
+Esta versão foca na melhoria da qualidade do código (DX - Developer Experience) e na atualização da documentação técnica. Foram aplicadas refatorações para aumentar a legibilidade do projeto e aprimorar a rastreabilidade através de logs mais descritivos.
 
 ---
+
+## 🔧 Chore (Manutenção e Refatoração)
+*   **Refatoração de Código:** Renomeação de variáveis e funções nos arquivos `app.py`, `ClickHouseDb.py` e `Metrics.py` para garantir consistência com as melhores práticas de Clean Code.
+*   **Melhoria de Logs:** Atualização das mensagens de log para facilitar o troubleshooting em ambiente de produção.
+*   **Documentação (README):** Revisão completa do arquivo `README.md`, com foco em clareza e completude das instruções de setup e arquitetura.
+*   **Manutenção de Comentários:** Atualização de comentários internos para refletir as lógicas atuais do sistema.
+
+## 🚀 Features
+* *Nesta versão não houve implementação de novas funcionalidades de negócio.*
 
 ## 🐛 Fixes
-
-- **Tratamento de Variáveis de Ambiente (`app.py`):**
-    - Corrigido bug onde a variável `TIME_SLEEP` era lida como *string* (padrão do OS), causando falhas na criação de threads.
-    - Implementada a conversão explícita para `integer` antes do uso, garantindo a compatibilidade com as funções de temporização do sistema.
-
-## 🔧 Chore
-
-- **Refatoração de Código:** Pequeno ajuste técnico no arquivo principal para aumentar a resiliência do carregamento de configurações.
+* *Nesta versão não houve correções de bugs reportados.*
 
 ---
 
-### 🛠 Detalhes Técnicos
-- **Commit:** `47c5ec2`
-- **Arquivos alterados:** `app.py` (+1 linha)
-- **Autor:** Carlos Eduardo Duarte Schwalm
+### 🛠 Detalhes Técnicos (Diff Stats)
+- **Arquivos alterados:** 4
+- **Inserções:** 78
+- **Deleções:** 105
+- **Commit ID:** `d79ba07`
+- **Responsável:** Carlos Eduardo Duarte Schwalm
