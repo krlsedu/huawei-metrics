@@ -30,31 +30,38 @@ DATA_VALID = True
 
 # --- LOOP EM BACKGROUND (HUAWEI -> CLICKHOUSE) ---
 def monitorar_huawei_background():
-    global DATA_VALID
     click_house = ClickHouseDb()
 
     while True:
         try:
-            # 1. Faz a raspagem do roteador
-            hosts = ax3_pro.scrape("/api/system/HostInfo")
-            wan = ax3_pro.scrape("/api/ntwk/wan?type=active")
-
-            lista_formatada = ax3_pro.get_metrics(hosts, wan, True)
-
-            if lista_formatada:
-                if isinstance(lista_formatada, str):
-                    lista_formatada = json.loads(lista_formatada)
-
-                click_house.save_network_metrics(lista_formatada)
-
-            DATA_VALID = True
+            _thread = threading.Thread(target=scrape_wan, args=(click_house, ax3_pro), daemon=True)
+            _thread.start()
 
         except Exception as e:
             app.logger.error(f"Erro na coleta de background: {e}")
-            DATA_VALID = False
 
-        # Dorme 2 segundos cravados até a próxima leitura
         time.sleep(5)
+
+def scrape_wan(click_house: ClickHouseDb, ax3_pro: Ax3Pro):
+    global DATA_VALID
+    try:
+        # 1. Faz a raspagem do roteador
+        hosts = ax3_pro.scrape("/api/system/HostInfo")
+        wan = ax3_pro.scrape("/api/ntwk/wan?type=active")
+
+        lista_formatada = ax3_pro.get_metrics(hosts, wan, True)
+
+        if lista_formatada:
+            if isinstance(lista_formatada, str):
+                lista_formatada = json.loads(lista_formatada)
+
+            click_house.save_network_metrics(lista_formatada)
+
+        DATA_VALID = True
+
+    except Exception as e:
+        app.logger.error(f"Erro na coleta de background: {e}")
+        DATA_VALID = False
 
 @app.route('/health')
 def health():
