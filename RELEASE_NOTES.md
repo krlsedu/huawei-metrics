@@ -1,39 +1,28 @@
-Com base na análise do commit `b92bd51` e no diff dos arquivos, aqui está o Release Notes técnico para a versão **v26.14.002**.
+Aqui está o Release Notes técnico para a versão **v26.14.003**, focado em clareza para a equipe de engenharia e stakeholders técnicos.
 
 ---
 
-# 📦 Release Notes - v26.14.002
+# 📦 Release Notes - v26.14.003
 
-## Resumo Técnico
-Esta versão foca na robustez da coleta de métricas e na atualização da infraestrutura de containers. Houve uma refatoração significativa no serviço de telemetria para melhorar a performance e a confiabilidade dos dados coletados.
+## Resumo
+Esta atualização foca na padronização e confiabilidade da coleta de métricas do sistema. O objetivo principal foi alinhar a exportação de dados com padrões de mercado (Prometheus) e refinar o cálculo de tráfego de rede para garantir observabilidade precisa.
 
 ---
 
 ## 🚀 Features
-
-### Refatoração do Serviço de Métricas (`services/Metrics.py`)
-*   **Otimização de Coleta:** Implementação de lógica aprimorada para processamento de dados (73 inserções vs 41 deleções), visando maior precisão na extração de indicadores de performance.
-*   **Melhoria na Estrutura de Dados:** Reestruturação interna do serviço para facilitar a escalabilidade de novos endpoints de monitoramento.
-
----
+- **Padronização Prometheus:** Formatação do output JSON de métricas ajustada para total compatibilidade com as convenções do Prometheus, facilitando a integração com dashboards Grafana.
+- **Cálculo de Tráfego LAN/WAN:** Implementação de lógica aprimorada para a distinção e cálculo de tráfego de rede, garantindo maior precisão nos dados de throughput.
 
 ## 🐛 Fixes
-
-### Estabilidade da Aplicação (`app.py`)
-*   Ajustes pontuais na inicialização do core da aplicação para garantir compatibilidade com as novas definições do serviço de métricas.
-
----
+- **Consistência de Nomenclatura:** Refatoração de identificadores e variáveis no serviço de métricas para eliminar ambiguidades e seguir o padrão do projeto.
+- **Documentação Inline:** Melhoria significativa nos comentários do código (`Metrics.py`), facilitando a manutenção futura e o entendimento da lógica de agregação.
 
 ## 🔧 Chore
-
-### Atualização de Infraestrutura (`docker-compose.yml`)
-*   Atualização de tags/versões de imagens no ambiente de orquestração para garantir paridade entre os ambientes de desenvolvimento e produção.
-*   Ajuste fino em definições de serviços para suportar as mudanças de telemetria.
-
-### Build & CI/CD
-*   **Triggered Build:** Sincronização de versão para o pipeline subsequente (26.14.003).
+- **Refatoração de Código:** Limpeza e reestruturação do arquivo `services/Metrics.py` (61 inserções, 50 deleções), resultando em um código mais modular e performático.
 
 ---
 
-**Tech Lead:** Carlos Eduardo Duarte Schwalm (krlsedu)
-**Commit Hash:** `b92bd51`
+### 🛠 Detalhes Técnicos
+- **Commit:** `b54a276`
+- **Arquivo afetado:** `services/Metrics.py`
+- **Autor:** Carlos Eduardo Duarte Schwalm (krlsedu)
